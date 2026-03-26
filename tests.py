@@ -1,6 +1,15 @@
 import pytest
 from model import Question
 
+@pytest.fixture
+def data():
+    question = Question(title='q1')
+    question.add_choice('a', is_correct=True)
+    question.add_choice('b')
+    question.add_choice('c')
+    question.add_choice('d', is_correct=True)
+    return question
+
 def test_create_question():
     question = Question(title='q1')
     assert question.id != None
@@ -160,5 +169,16 @@ def test_complete_selection():
     correct_choices = question.correct_selected_choices([2])
     assert len(correct_choices) == 1
     assert correct_choices[0] == 2
+
+def test_correct_selected_with_fixture(data):
+    correct_choices = data.correct_selected_choices([1])
+    assert len(correct_choices) == 1
+    assert correct_choices[0] == 1
+
+def test_set_correct_choices_with_fixture(data):
+    data.set_correct_choices([2, 3])
+    
+    new_correct = [choice.id for choice in data.choices if choice.is_correct]
+    assert new_correct == [1, 2, 3, 4]
         
     
